@@ -966,6 +966,56 @@ public class InternFormula {
 		return null;
 	}
 
+	public boolean isSelectedTokenFirstParamOfRegularExpression() {
+
+		boolean isFirstParamInRegularExpression = false;
+
+		if (internFormulaTokenSelection != null) {
+			int indexOfSelectedTokenInTokenSelection = internFormulaTokenSelection.getStartIndex();
+
+			if (indexOfSelectedTokenInTokenSelection >= 2) {
+
+				isFirstParamInRegularExpression =
+						isSelectedTokenTypeString(indexOfSelectedTokenInTokenSelection)
+								&& isTokenBeforeSelectedTypeBracketOpen(indexOfSelectedTokenInTokenSelection)
+								&& isTwoTokensBeforeSelectedAFunctionAndNamedRegex(indexOfSelectedTokenInTokenSelection);
+			}
+		}
+		return isFirstParamInRegularExpression;
+	}
+
+	private boolean isSelectedTokenTypeString(int index) {
+		boolean isString = true;
+		InternTokenType typeString = InternTokenType.STRING;
+		if (!(internTokenFormulaList.get(index).getInternTokenType()
+				== typeString)) {
+			isString = false;
+		}
+		return isString;
+	}
+
+	private boolean isTokenBeforeSelectedTypeBracketOpen(int index) {
+		boolean isBracket = true;
+		InternTokenType typeBracketOpen = InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN;
+		if (!(internTokenFormulaList.get(index - 1).getInternTokenType()
+				== typeBracketOpen)) {
+			isBracket = false;
+		}
+		return isBracket;
+	}
+
+	private boolean isTwoTokensBeforeSelectedAFunctionAndNamedRegex(int index) {
+		boolean isRegex = true;
+		InternTokenType typeFunctionName = InternTokenType.FUNCTION_NAME;
+		String stringOfRegularExpression = "REGEX";
+		InternToken functionToken = internTokenFormulaList.get(index - 2);
+		if (!(functionToken.getInternTokenType() == typeFunctionName
+				&& functionToken.getTokenStringValue().equals(stringOfRegularExpression))) {
+			isRegex = false;
+		}
+		return isRegex;
+	}
+
 	public String getSelectedText() {
 		InternToken token = getSelectedToken();
 		if (token == null) {

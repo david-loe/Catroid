@@ -49,7 +49,7 @@ public class FormulaEditorEditText extends EditText implements OnTouchListener {
 	private static final BackgroundColorSpan COLOR_HIGHLIGHT = new BackgroundColorSpan(0xFF33B5E5);
 	private FormulaEditorHistory history = null;
 	FormulaEditorFragment formulaEditorFragment = null;
-	private int absoluteCursorPosition = 0;
+	public int absoluteCursorPosition = 0;
 	private InternFormula internFormula;
 	private Context context;
 	private Paint paint = new Paint();
@@ -271,6 +271,10 @@ public class FormulaEditorEditText extends EditText implements OnTouchListener {
 
 	public String getSelectedTextFromInternFormula() {
 		return internFormula.getSelectedText();
+	}
+
+	public boolean isSelectedTokenFirstParamOfRegularExpression() {
+		return internFormula.isSelectedTokenFirstParamOfRegularExpression();
 	}
 
 	public void overrideSelectedText(String string) {
