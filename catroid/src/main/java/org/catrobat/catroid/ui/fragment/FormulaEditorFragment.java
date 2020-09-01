@@ -29,6 +29,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -381,6 +382,14 @@ public class FormulaEditorFragment extends Fragment implements ViewTreeObserver.
 		builder.setTitle(titleId)
 				.setNegativeButton(R.string.cancel, null)
 				.show();
+/**
+		Log.i("Thomas Selected",
+				getFormulaEditorEditText().getSelectedTextFromInternFormula());
+		Log.i("Thomas Full",
+				getFormulaEditorEditText().getStringFromInternFormula());
+		Log.i("Thomas ", " " + getFormulaEditorEditText().getSelectionStart());
+**/
+
 	}
 
 	public void addString(String string) {
