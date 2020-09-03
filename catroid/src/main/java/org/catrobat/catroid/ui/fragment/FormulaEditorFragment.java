@@ -328,7 +328,13 @@ public class FormulaEditorFragment extends Fragment implements ViewTreeObserver.
 							endFormulaEditor();
 							return true;
 						case R.id.formula_editor_keyboard_string:
-							showNewStringDialog();
+
+							if (isSelectedTextFirstParamOfRegularExpression()) {
+								showNewRegexAssistantDialog(); //open with regex assistant, or edit as text
+							} else {
+								showNewStringDialog();
+							}
+
 							return true;
 						case R.id.formula_editor_keyboard_delete:
 							formulaEditorEditText.handleKeyEvent(view.getId(), "");
@@ -367,6 +373,14 @@ public class FormulaEditorFragment extends Fragment implements ViewTreeObserver.
 		((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(actionBarTitleBuffer);
 	}
 
+	private boolean isSelectedTextFirstParamOfRegularExpression() {
+		return getFormulaEditorEditText().isSelectedTokenFirstParamOfRegularExpression();
+	}
+
+	private void showNewRegexAssistantDialog() {
+		Log.i("Thomas Success", "yay es functioniert!!!! Vielleicht");
+	}
+
 	private void showNewStringDialog() {
 		String selectedFormulaText = getSelectedFormulaText();
 
@@ -382,13 +396,6 @@ public class FormulaEditorFragment extends Fragment implements ViewTreeObserver.
 		builder.setTitle(titleId)
 				.setNegativeButton(R.string.cancel, null)
 				.show();
-/**
-		Log.i("Thomas Selected",
-				getFormulaEditorEditText().getSelectedTextFromInternFormula());
-		Log.i("Thomas Full",
-				getFormulaEditorEditText().getStringFromInternFormula());
-		Log.i("Thomas ", " " + getFormulaEditorEditText().getSelectionStart());
-**/
 
 	}
 

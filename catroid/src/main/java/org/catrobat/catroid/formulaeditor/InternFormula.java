@@ -966,6 +966,75 @@ public class InternFormula {
 		return null;
 	}
 
+	public boolean isSelectedTokenFirstParamOfRegularExpression() {
+		List<InternToken> tokenList = internTokenFormulaList;
+
+		boolean isFirstParamInRegularExpression = false;
+
+		// data variables, sensors etc all return null as selected token and
+		// internFormulaTokenSelection.
+		// Since we only want Strings and maybe Function Names, we limit our check to only those
+		if (internFormulaTokenSelection != null) {
+			int indexOfSelectedTokenInTokenSelection = internFormulaTokenSelection.getStartIndex();
+
+			/*
+			isFirstParamInRegularExpression =
+					isSelectedTokenTypeString()
+							&& isTokenBeforeSelectedATypeBracketOpen()
+							&& is2TokensBeforeSelectedAFunctionAndNamedRegex();
+			*/
+
+			if (indexOfSelectedTokenInTokenSelection >= 2) {
+				isFirstParamInRegularExpression = true;
+				//is our selected Token a String?
+				InternTokenType typeString = InternTokenType.STRING;
+				if (!(tokenList.get(indexOfSelectedTokenInTokenSelection).getInternTokenType()
+						== typeString)) {
+					isFirstParamInRegularExpression = false;
+				}
+				//isSelectedTokenTypeString()
+
+				//is our previous token an BRACKET_OPEN?
+				InternTokenType typeBracketOpen = InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN;
+				if (!(tokenList.get(indexOfSelectedTokenInTokenSelection - 1).getInternTokenType()
+						== typeBracketOpen)) {
+					isFirstParamInRegularExpression = false;
+				}
+				//isTokenBeforeSelectedATypeBracketOpen()
+
+				//is the token before that a Function with the name REGEX and type FUNCTION_NAME
+				InternTokenType typeFunctionName = InternTokenType.FUNCTION_NAME;
+				String stringOfRegularExpression = "REGEX";
+				InternToken functionToken = tokenList.get(indexOfSelectedTokenInTokenSelection - 2);
+				if (!(functionToken.getInternTokenType() == typeFunctionName
+						&& functionToken.getTokenStringValue().equals(stringOfRegularExpression))) {
+					isFirstParamInRegularExpression = false;
+				}
+				//isTwoTokensBeforeSelectedAFunctionAndNamedRegex()
+
+				Log.i("Thomas Selected Token", tokenList.get(indexOfSelectedTokenInTokenSelection)
+						.getTokenStringValue());
+				Log.i("Thomas index:", "" + indexOfSelectedTokenInTokenSelection);
+				for (InternToken t : tokenList) {
+					Log.i("Thomas TokenList", t.getTokenStringValue() + " "
+							+ t.getInternTokenType());
+				}
+			}
+		}
+		return isFirstParamInRegularExpression;
+	}
+
+	private boolean isSelectedTokenTypeString() {
+		return false;
+	}
+	private boolean isTokenBeforeSelectedATypeBracketOpen() {
+		return false;
+	}
+	private boolean isTwoTokensBeforeSelectedAFunctionAndNamedRegex() {
+		return false;
+	}
+
+
 	public String getSelectedText() {
 		InternToken token = getSelectedToken();
 		if (token == null) {
