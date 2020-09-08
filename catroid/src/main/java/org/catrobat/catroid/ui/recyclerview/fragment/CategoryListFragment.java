@@ -26,7 +26,6 @@ package org.catrobat.catroid.ui.recyclerview.fragment;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -51,6 +50,8 @@ import org.catrobat.catroid.ui.recyclerview.dialog.TextInputDialog;
 import org.catrobat.catroid.ui.settingsfragments.RaspberryPiSettingsFragment;
 import org.catrobat.catroid.ui.settingsfragments.SettingsFragment;
 import org.catrobat.catroid.utils.AddUserListDialog;
+import org.catrobat.catroid.utils.HtmlExtractorDialog;
+import org.catrobat.catroid.utils.HtmlExtractorInputDialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -280,13 +281,32 @@ public class CategoryListFragment extends Fragment implements CategoryListRVAdap
 				if (LIST_FUNCTIONS.contains(item.nameResId)) {
 					onUserListFunctionSelected(item);
 				} else if (R.string.formula_editor_function_html_extractor_temp == item.nameResId) {
-					Log.i("test", "wurde geklickt");
+					onHtmlExtractorSelected(item);
 				} else {
 					addResourceToActiveFormulaInFormulaEditor(item);
 					getActivity().onBackPressed();
 				}
 				break;
 		}
+	}
+
+	private void onHtmlExtractorSelected(CategoryListItem item) {
+		FragmentActivity activity = getActivity();
+		HtmlExtractorInputDialog.Builder builder = new HtmlExtractorInputDialog.Builder(activity);
+		HtmlExtractorDialog dialog = new HtmlExtractorDialog(builder);
+
+		dialog.show(activity.getString(R.string.keyword_label),
+				activity.getString(R.string.html_label), activity.getString(R.string.ok),
+				new HtmlExtractorDialog.Callback() {
+
+					@Override
+					public void onPositiveButton(DialogInterface dialog, String keywordInput, String htmlInput) {
+					}
+					@Override
+					public void onNegativeButton() {
+						activity.onBackPressed();
+					}
+				});
 	}
 
 	private FormulaEditorFragment addResourceToActiveFormulaInFormulaEditor(CategoryListItem categoryListItem) {
