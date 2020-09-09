@@ -52,6 +52,7 @@ import org.catrobat.catroid.ui.settingsfragments.SettingsFragment;
 import org.catrobat.catroid.utils.AddUserListDialog;
 import org.catrobat.catroid.utils.HtmlExtractorDialog;
 import org.catrobat.catroid.utils.HtmlExtractorInputDialog;
+import org.catrobat.catroid.utils.HtmlRegexExtractor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -301,7 +302,9 @@ public class CategoryListFragment extends Fragment implements CategoryListRVAdap
 
 					@Override
 					public void onPositiveButton(DialogInterface dialog, String keywordInput, String htmlInput) {
-					}
+						HtmlRegexExtractor htmlRegexExt = new HtmlRegexExtractor(getActivity());
+						htmlRegexExt.searchKeyword(keywordInput, htmlInput);
+						}
 					@Override
 					public void onNegativeButton() {
 						activity.onBackPressed();
