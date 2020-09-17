@@ -36,16 +36,16 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 
-import static junit.framework.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class InternFormulaRegexAssistantTest {
 
 	private InternFormula internFormula;
 
-	@Test //Regex Funktion ist ausgewählt - expected: true (nichts einfügen)
+	//doubleClickIndex set to specific index related to the extern string representation
+	// described inside the second comment of each test
+	@Test
 	public void testRegexFunctionIsSelected() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//regular expression ('Hello', 'World')
@@ -63,12 +63,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = 1;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertTrue("Regular expression is selected and therefore we are already in a regular "
-						+ "expression",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(0,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Regex Funktion 1st Param ausgewählt - expected: True
+	@Test
 	public void testRegexFunctionFirstParamIsSelected() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//regular expression('Hello', 'World')
@@ -86,12 +85,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("Hello") + 1;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertTrue("First parameter of regular expression is selected and therefore we are "
-						+ "already in a regular expression",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(0,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Regex Funktion 2nd Param ausgewählt - expected: True
+	@Test
 	public void testRegexFunctionSecondParamIsSelected() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//regular expression('Hello', 'World')
@@ -109,12 +107,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("World") + 1;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertTrue("Second parameter of regular expression is selected, therefore we are "
-						+ "already in a regular expression",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(0,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Join ausgewählt - kein äußeres Regex - expected: false
+	@Test
 	public void testJoinFunctionIsSelectedWithNoOutsideRegexFunction() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//join('Hello', 'World')
@@ -132,12 +129,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = 1;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertFalse("Join is selected and no regular expression is outside, therefore a regular "
-						+ "expression should be inserted",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(-1,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Join ausgewählt - äußeres Regex existiert - expected: True
+	@Test
 	public void testJoinFunctionIsSelectedWithOutsideRegexFunction() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//regular expression(join('Hello','World'), 'Foobar')
@@ -160,12 +156,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = 7;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertTrue("Join is selected and regular expression is outside, therefore a regular "
-						+ "expression should not be inserted",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(0,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Join 1st param nicht regex ausgewählt - expected: false
+	@Test
 	public void testJoinFunctionFirstParamIsSelectedAndIsNoRegexFunction() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//join('Hello', 'World')
@@ -183,12 +178,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("Hello") + 1;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertFalse("First param of Join function is selected and is not a regular expression, "
-						+ "therefore a regular expression should be inserted",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(-1,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Join 2nd param nicht regex ausgewählt - expected: false
+	@Test
 	public void testJoinFunctionSecondParamIsSelectedAndIsNoRegexFunction() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//join('Hello', 'World')
@@ -206,12 +200,11 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("World") + 1;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertFalse("Second param of Join function is selected and is not a regular expression, "
-						+ "therefore a regular expression should be inserted",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(-1,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Join 1st param regex ausgewählt - expected: True
+	@Test
 	public void testJoinFunctionFirstParamIsSelectedAndIsRegexFunction() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//join(regular expression('Hello', 'World'), 'Foobar')
@@ -231,18 +224,15 @@ public class InternFormulaRegexAssistantTest {
 		internFormula = new InternFormula(internTokens);
 		internFormula.generateExternFormulaStringAndInternExternMapping(Mockito.mock(Context.class));
 
-		//7 is the index of the second letter of the external string representation of
-		// regular expression
 		int doubleClickIndex = 7;
 
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertTrue("Regular expression function in Join function is selected, therefore no "
-						+ "regular expression should be inserted",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(2,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
-	@Test //Join 2nd param regex ausgewählt - expected: True
+	@Test
 	public void testJoinFunctionSecondParamIsSelectedAndIsRegexFunction() {
 		ArrayList<InternToken> internTokens = new ArrayList<>();
 		//join('Foobar', regular expression('Hello', 'World'))
@@ -265,15 +255,131 @@ public class InternFormulaRegexAssistantTest {
 		int doubleClickIndex = 18;
 		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
-		assertTrue("Regular expression function in Join function is selected, therefore no "
-						+ "regular expression should be inserted",
-				internFormula.isSelectionPartOfRegularExpression());
+		assertEquals(4,
+				internFormula.getIndexOfCorrespondingRegularExpression());
 	}
 
+	@Test
+	public void testRegexFunctionIsSelectedAndFirstParamGetsSelected() {
+		ArrayList<InternToken> internTokens = new ArrayList<>();
+		//regular expression ('Hello', 'World')
+		//null( 'Hello' , 'World' )
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.REGEX.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+		internTokens.add(new InternToken(InternTokenType.STRING, "Hello"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+		internTokens.add(new InternToken(InternTokenType.STRING, "World"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
 
+		internFormula = new InternFormula(internTokens);
+		internFormula.generateExternFormulaStringAndInternExternMapping(Mockito.mock(Context.class));
 
+		int doubleClickIndex = 1;
+		internFormula.setCursorAndSelection(doubleClickIndex, true);
 
+		internFormula.setSelectionToFirstParamOfRegularExpressionAtInternalIndex(0);
+		assertEquals(2, internFormula.getIndexOfInternTokenSelection());
+	}
 
+	@Test
+	public void testRegexFunctionFirstParamIsSelectedAndFirstParamGetsSelected() {
+		ArrayList<InternToken> internTokens = new ArrayList<>();
+		//regular expression ('Hello', 'World')
+		//null( 'Hello' , 'World' )
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.REGEX.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+		internTokens.add(new InternToken(InternTokenType.STRING, "Hello"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+		internTokens.add(new InternToken(InternTokenType.STRING, "World"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
 
-	//2nd Regex ausgewählt - wählt 1st param in 2nd regex aus
+		internFormula = new InternFormula(internTokens);
+		internFormula.generateExternFormulaStringAndInternExternMapping(Mockito.mock(Context.class));
+
+		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("Hello") + 1;
+		internFormula.setCursorAndSelection(doubleClickIndex, true);
+
+		internFormula.setSelectionToFirstParamOfRegularExpressionAtInternalIndex(0);
+		assertEquals(2, internFormula.getIndexOfInternTokenSelection());
+	}
+
+	@Test
+	public void testRegexFunctionSecondParamIsSelectedAndFirstParamGetsSelected() {
+		ArrayList<InternToken> internTokens = new ArrayList<>();
+		//regular expression ('Hello', 'World')
+		//null( 'Hello' , 'World' )
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.REGEX.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+		internTokens.add(new InternToken(InternTokenType.STRING, "Hello"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+		internTokens.add(new InternToken(InternTokenType.STRING, "World"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
+
+		internFormula = new InternFormula(internTokens);
+		internFormula.generateExternFormulaStringAndInternExternMapping(Mockito.mock(Context.class));
+
+		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("World") + 1;
+		internFormula.setCursorAndSelection(doubleClickIndex, true);
+
+		internFormula.setSelectionToFirstParamOfRegularExpressionAtInternalIndex(0);
+		assertEquals(2, internFormula.getIndexOfInternTokenSelection());
+	}
+
+	@Test
+	public void testSecondRegexFunctionSecondParamIsSelected() {
+		ArrayList<InternToken> internTokens = new ArrayList<>();
+		//join (regular expression( 'regex1', 'text1'), regular expression ('regex2', 'text2'))
+		//null( null( 'regex1' , 'text1' ) , null( 'regex2' , 'text2' ))
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.JOIN.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.REGEX.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+		internTokens.add(new InternToken(InternTokenType.STRING, "regex1"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+		internTokens.add(new InternToken(InternTokenType.STRING, "text1"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
+
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.REGEX.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+		internTokens.add(new InternToken(InternTokenType.STRING, "regex2"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+		internTokens.add(new InternToken(InternTokenType.STRING, "text2"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
+
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
+
+		internFormula = new InternFormula(internTokens);
+		internFormula.generateExternFormulaStringAndInternExternMapping(Mockito.mock(Context.class));
+
+		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("text2") + 1;
+		internFormula.setCursorAndSelection(doubleClickIndex, true);
+
+		internFormula.setSelectionToFirstParamOfRegularExpressionAtInternalIndex(internFormula.getIndexOfCorrespondingRegularExpression());
+		assertEquals(11, internFormula.getIndexOfInternTokenSelection());
+	}
+
+	@Test
+	public void testNonRegexFunctionSecondParamSelectedStaysSelected() {
+		ArrayList<InternToken> internTokens = new ArrayList<>();
+		//join ('Hello', 'World')
+		//null( 'Hello' , 'World' )
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_NAME, Functions.JOIN.name()));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN));
+		internTokens.add(new InternToken(InternTokenType.STRING, "Hello"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETER_DELIMITER));
+		internTokens.add(new InternToken(InternTokenType.STRING, "World"));
+		internTokens.add(new InternToken(InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE));
+
+		internFormula = new InternFormula(internTokens);
+		internFormula.generateExternFormulaStringAndInternExternMapping(Mockito.mock(Context.class));
+
+		int doubleClickIndex = internFormula.getExternFormulaString().indexOf("World") + 1;
+		internFormula.setCursorAndSelection(doubleClickIndex, true);
+
+		internFormula.setSelectionToFirstParamOfRegularExpressionAtInternalIndex(-1);
+		assertEquals(4, internFormula.getIndexOfInternTokenSelection());
+	}
 }

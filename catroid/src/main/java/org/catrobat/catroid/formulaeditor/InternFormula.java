@@ -1020,28 +1020,46 @@ public class InternFormula {
 		return isRegex;
 	}
 
-	public boolean isSelectionPartOfRegularExpression() {
+	public int getIndexOfInternTokenSelection() {
+		if (internFormulaTokenSelection != null) {
+			return internFormulaTokenSelection.getStartIndex();
+		}
+		return -1;
+	}
+
+	public void setSelectionToFirstParamOfRegularExpressionAtInternalIndex(int indexOfRegularExpression) {
+		if (indexOfRegularExpression < 0) {
+			return;
+		}
+
+		int indexOfFirstParam = indexOfRegularExpression + 2;
+
+		cursorPositionInternTokenIndex = indexOfFirstParam;
+		updateExternCursorPosition(CursorTokenPropertiesAfterModification.RIGHT);
+		setCursorAndSelection(externCursorPosition, true);
+	}
+
+	public int getIndexOfCorrespondingRegularExpression() {
 		int indexOfSelectedToken = -1;
 		if (internFormulaTokenSelection != null) {
 			indexOfSelectedToken = internFormulaTokenSelection.getStartIndex();
-		}
-		InternToken selectedToken = internTokenFormulaList.get(indexOfSelectedToken);
 
-		InternTokenType selectedType = selectedToken.getInternTokenType();
-		String selectedStringValue = selectedToken.getTokenStringValue();
+			InternToken selectedToken = internTokenFormulaList.get(indexOfSelectedToken);
 
-		if (selectedType == InternTokenType.FUNCTION_NAME
-				&& selectedStringValue.equals(Functions.REGEX.name())) {
-			return true;
-		} else {
-			if (isAParamOfRegularExpression(indexOfSelectedToken)) {
-				return true;
+			InternTokenType selectedType = selectedToken.getInternTokenType();
+			String selectedStringValue = selectedToken.getTokenStringValue();
+
+			if (selectedType == InternTokenType.FUNCTION_NAME
+					&& selectedStringValue.equals(Functions.REGEX.name())) {
+				return indexOfSelectedToken;
+			} else {
+				return getIndexOfRegularExpressionIfParamIsSelected(indexOfSelectedToken);
 			}
 		}
-		return false;
+		return -1;
 	}
 
-	private boolean isAParamOfRegularExpression(int index) {
+	private int getIndexOfRegularExpressionIfParamIsSelected(int index) {
 		if (index >= 2) {
 			int bracketCount = 0;
 
@@ -1058,13 +1076,13 @@ public class InternFormula {
 						InternToken functionToken = internTokenFormulaList.get(i - 1);
 						if (functionToken.getInternTokenType() == InternTokenType.FUNCTION_NAME
 								&& functionToken.getTokenStringValue().equals(Functions.REGEX.name())) {
-							return true;
+							return i - 1;
 						}
 					}
 				}
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	public String getSelectedText() {
