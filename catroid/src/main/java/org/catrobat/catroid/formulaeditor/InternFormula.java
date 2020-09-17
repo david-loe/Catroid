@@ -1020,6 +1020,10 @@ public class InternFormula {
 		return isRegex;
 	}
 
+	public boolean isSelectionInsideRegularExpression() {
+		return false;
+	}
+
 	public String getSelectedText() {
 		InternToken token = getSelectedToken();
 		if (token == null) {
