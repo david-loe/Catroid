@@ -1020,6 +1020,53 @@ public class InternFormula {
 		return isRegex;
 	}
 
+	public boolean isSelectionPartOfRegularExpression() {
+		int indexOfSelectedToken = -1;
+		if (internFormulaTokenSelection != null) {
+			indexOfSelectedToken = internFormulaTokenSelection.getStartIndex();
+		}
+		InternToken selectedToken = internTokenFormulaList.get(indexOfSelectedToken);
+
+		InternTokenType selectedType = selectedToken.getInternTokenType();
+		String selectedStringValue = selectedToken.getTokenStringValue();
+
+		if (selectedType == InternTokenType.FUNCTION_NAME
+				&& selectedStringValue.equals(Functions.REGEX.name())) {
+			return true;
+		} else {
+			if (isAParamOfRegularExpression(indexOfSelectedToken)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isAParamOfRegularExpression(int index) {
+		if (index >= 2) {
+			int bracketCount = 0;
+
+			for (int i = index - 1; i >= 0; i--) {
+				InternToken iteratedToken = internTokenFormulaList.get(i);
+				if (iteratedToken.getInternTokenType() == InternTokenType.FUNCTION_PARAMETERS_BRACKET_CLOSE) {
+					bracketCount -= 1;
+				} else if (iteratedToken.getInternTokenType() == InternTokenType.FUNCTION_PARAMETERS_BRACKET_OPEN) {
+					bracketCount += 1;
+				}
+
+				if (bracketCount == 1) {
+					if (i > 0) {
+						InternToken functionToken = internTokenFormulaList.get(i - 1);
+						if (functionToken.getInternTokenType() == InternTokenType.FUNCTION_NAME
+								&& functionToken.getTokenStringValue().equals(Functions.REGEX.name())) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	public String getSelectedText() {
 		InternToken token = getSelectedToken();
 		if (token == null) {
